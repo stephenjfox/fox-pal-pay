@@ -1,0 +1,6 @@
+.idea/
+.gradle
+.kotlintest
+out/
+build
+*.class
