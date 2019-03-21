@@ -15,11 +15,17 @@ repositories {
 def arrow_version = "0.9.0"
 
 dependencies {
-    // I want to use ArrowKt (https://arrow-kt.io/docs/)
-    compile "io.arrow-kt:arrow-core-data:$arrow_version"
-    compile "io.arrow-kt:arrow-core-extensions:$arrow_version"
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // I want to use ArrowKt (https://arrow-kt.io/docs/)
+    implementation "io.arrow-kt:arrow-core-data:$arrow_version"
+    implementation "io.arrow-kt:arrow-core-extensions:$arrow_version"
+
+    implementation group: "org.http4k", name: "http4k-core", version: "3.32.1"
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.32.1"
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.32.1"
+
+
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.3.0'
 }
 

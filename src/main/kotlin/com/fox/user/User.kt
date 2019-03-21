@@ -1,4 +1,4 @@
-package com.fox
+package com.fox.user
 
 /**
  * Created by Stephen Fox on 3/16/19.
@@ -9,7 +9,7 @@ package com.fox
  * being a dumb data carrier that needs orchestration.
  * Objects can be smart
  */
-class User(val balance: Double) {
+class User private constructor(val balance: Double) {
 
     companion object {
 

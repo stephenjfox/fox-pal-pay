@@ -1,4 +1,4 @@
-import com.fox.User
+import com.fox.user.User
 import io.kotlintest.properties.Gen
 
 /**
@@ -8,6 +8,6 @@ class UserGenerator: Gen<User> {
     override fun constants() = emptyList<User>()
 
     override fun random() = generateSequence {
-        User(Gen.double().random().first())
+        User.inMemory(Gen.double().random().first())
     }
 }
