@@ -9,6 +9,10 @@ import java.util.*
 
 typealias UserId = UUID
 
+/**
+ * Almost a marker interface. As these are egregious in code bases, unless they are
+ * annotations, this may be deleted. In that case, we would just deal with classes
+ */
 interface IUser {
     val balance: Money
 
@@ -42,4 +46,4 @@ private constructor(
     }
 }
 
-data class User(val balance: Money)
+data class User(override val balance: Money): IUser
