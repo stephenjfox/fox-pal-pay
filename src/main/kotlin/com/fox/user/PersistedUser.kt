@@ -22,7 +22,8 @@ interface IUser {
 /**
  * An lazy, delegating type that loads data when necessary, rather than
  * being a dumb data carrier that needs orchestration.
- * Objects can be smart
+ *
+ * TODO: Rename. This class is persist-able (because it comes with an id)
  */
 class PersistedUser
 private constructor(

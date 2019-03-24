@@ -48,6 +48,26 @@ class ReceiveMoneySpecification : FeatureSpec({
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
 
+        scenario("The receiver rejects, no transaction occurs") {
+            val user1 = PersistedUser.inMemory(100.0)
+            val user2 = PersistedUser.inMemory(100.0)
+
+            usersRepository.register(user1, user2)
+
+            with(service) {
+
+                val request = user1.ask(user2, forAmount = 20.0)
+                user1.pendingRequests(user2).count() shouldBe 1
+
+                user2.reject(request)
+
+                // balances should be unchanged
+                usersRepository[user1.id].balance shouldBe user1.balance
+                usersRepository[user2.id].balance shouldBe user2.balance
+            }
+
+        }
+
         scenario("The receiver has a request out to the lender") {
 
             val user1 = PersistedUser.inMemory(100.0)
