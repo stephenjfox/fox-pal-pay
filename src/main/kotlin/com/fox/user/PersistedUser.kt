@@ -27,7 +27,7 @@ interface IUser {
 class PersistedUser
 private constructor(
     override val balance: Money,
-    val id: UserId = lazy { UserId.randomUUID() }.value
+    val id: UserId = UserId.randomUUID()
 ) : IUser {
 
     companion object {

@@ -31,19 +31,6 @@ class MoneyEntreatyService(
     private val requestsRepository: RequestsRepository = RequestsRepository()
 ) {
     /**
-     * filter the transactions for the request that [requester] made to [entreated]
-     * and begin the computation.
-     */
-    private fun createRequest(requester: PersistedUser, entreated: PersistedUser, amount: Money): MoneyEntreatyRequest {
-        // Maybe a persisted extension class that just delegates...
-        val request = MoneyEntreatyRequest(amount, receiver = requester, entreatant = entreated)
-
-        requestsRepository.track(request)
-
-        return request
-    }
-
-    /**
      * Accept the request for money on behalf of the [persistedUser], deducting the [MoneyEntreatyRequest.amount]
      * from that user and giving it to the [MoneyEntreatyRequest.receiver]
      */
@@ -59,6 +46,28 @@ class MoneyEntreatyService(
         // close the transaction
         requestsRepository.complete(request, persistedUser.id)
     }
+
+    /**
+     * filter the transactions for the request that [requester] made to [entreated]
+     * and begin the computation.
+     */
+    private fun createRequest(requester: PersistedUser, entreated: PersistedUser, amount: Money): MoneyEntreatyRequest {
+        // Maybe a persisted extension class that just delegates...
+        val request = MoneyEntreatyRequest(amount, receiver = requester, entreatant = entreated)
+
+        requestsRepository.track(request)
+
+        return request
+    }
+
+    /**
+     * Removes the [request] for the supplied [persistedUser]
+     */
+    private fun deleteRequest(persistedUser: PersistedUser, request: MoneyEntreatyRequest) {
+        // no transaction, just don't allow the request to be processed
+        requestsRepository.complete(request, persistedUser.id)
+    }
+
 
     /*
     ================================================================================
@@ -96,7 +105,8 @@ class MoneyEntreatyService(
     }
 
     /**
-     * [this] asks [user] [forAmount] of [Money].
+     * [this] asks [user] [forAmount] of [Money]. There is an associated side-effect that persists
+     * the created request. It is being tracked without burdening the user of this function.
      *
      * Meant to support the following DSL:
      * <code>
@@ -106,6 +116,11 @@ class MoneyEntreatyService(
     fun PersistedUser.ask(user: PersistedUser, forAmount: Money): MoneyEntreatyRequest {
         return this@MoneyEntreatyService.createRequest(this, user, forAmount)
     }
+
+    fun PersistedUser.reject(reject: MoneyEntreatyRequest) {
+        this@MoneyEntreatyService.deleteRequest(this, reject)
+    }
+
 }
 
 private operator fun PersistedUser.minus(amount: Money): User {

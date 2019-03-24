@@ -3,6 +3,7 @@ import com.fox.persistence.UsersRepository
 import com.fox.user.PersistedUser
 import io.kotlintest.matchers.doubles.shouldBeExactly
 import io.kotlintest.matchers.numerics.shouldNotBeLessThan
+import io.kotlintest.shouldBe
 import io.kotlintest.specs.FeatureSpec
 
 /**
@@ -10,7 +11,7 @@ import io.kotlintest.specs.FeatureSpec
  */
 class ReceiveMoneySpecification : FeatureSpec({
 
-    feature("User.accept") {
+    feature("User.accept()") {
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
@@ -28,7 +29,7 @@ class ReceiveMoneySpecification : FeatureSpec({
             usersRepository[user1.id].balance shouldBeExactly initialBalance + request.amount
         }
 
-        scenario("The receiver has a request out to the sender") {
+        scenario("The receiver has a request out to the lender") {
             val user1 = PersistedUser.inMemory(0.0)
             val user2 = PersistedUser.inMemory(20.0)
 
@@ -40,6 +41,29 @@ class ReceiveMoneySpecification : FeatureSpec({
                 user2.accept(user1.ask(user2, forAmount = 10.0))
             }
         }
+    }
+
+    feature("User.reject()") {
+
+        val usersRepository = UsersRepository()
+        val service = MoneyEntreatyService(usersRepository)
+
+        scenario("The receiver has a request out to the lender") {
+
+            val user1 = PersistedUser.inMemory(100.0)
+            val user2 = PersistedUser.inMemory(100.0)
+
+            with(service) {
+                // initial state: a pending request
+                val initialRequest = user1.ask(user2, forAmount = 10.0)
+                user1.pendingRequests(forUser = user2).count() shouldBe 1
+
+                user2.reject(initialRequest)
+                user1.pendingRequests(forUser = user2).count() shouldBe 0
+            }
+        }
+
+
     }
 
 })
