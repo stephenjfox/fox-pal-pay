@@ -1,12 +1,15 @@
 package com.fox.p2p
 
 import com.fox.money.Money
-import com.fox.user.User
+import com.fox.user.PersistedUser
 
 /**
  * Created by Stephen Fox on 3/16/19.
  */
 
+/**
+ * Marker interface. May be subject to deletion should it be excessive
+ */
 interface MoneyRequest
 
 data class MoneyEntreatyRequest(
@@ -17,9 +20,9 @@ data class MoneyEntreatyRequest(
     /**
      * One whose balance will increase as a result of the [entreatant] accepting the request
      */
-    val receiver: User,
+    val receiver: PersistedUser,
     /**
      * The [entreatant] is the user from whom the [amount] will be deducted
      */
-    val entreatant: User
+    val entreatant: PersistedUser
 ): MoneyRequest
