@@ -2,20 +2,18 @@ package com.fox.user
 
 import io.kotlintest.matchers.types.shouldBeSameInstanceAs
 import io.kotlintest.shouldBe
-import io.kotlintest.specs.FeatureSpec
+import io.kotlintest.specs.FunSpec
 
-class PersistableUserSpecification : FeatureSpec({
+class PersistableUserSpecification : FunSpec({
 
-    feature("Generated id") {
-        scenario("Created with a unique id") {
-            val user = PersistableUser.inMemory(10.0)
-            user.id shouldBeSameInstanceAs user.id
-        }
-        scenario("Id is the same across accesses") {
-            val user = PersistableUser.inMemory(20.0)
+    test("Created with a unique id") {
+        val user = PersistableUser.inMemory(10.0)
+        user.id shouldBeSameInstanceAs user.id
+    }
+    test("Id is the same across accesses") {
+        val user = PersistableUser.inMemory(20.0)
 
-            user.id.toString() shouldBe user.id.toString()
-        }
+        user.id.toString() shouldBe user.id.toString()
     }
 
 })

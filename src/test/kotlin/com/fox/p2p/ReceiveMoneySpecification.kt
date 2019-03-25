@@ -5,19 +5,19 @@ import com.fox.user.PersistableUser
 import io.kotlintest.matchers.doubles.shouldBeExactly
 import io.kotlintest.matchers.numerics.shouldNotBeLessThan
 import io.kotlintest.shouldBe
-import io.kotlintest.specs.FeatureSpec
+import io.kotlintest.specs.FunSpec
 
 /**
  * Created by Stephen Fox on 3/21/19.
  */
-class ReceiveMoneySpecification : FeatureSpec({
+class ReceiveMoneySpecification : FunSpec({
 
-    feature("User.accept()") {
+    context("User.accept()") {
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
 
-        scenario("The receiver accepts the request, the sender has the funds for the transaction") {
+        test("The receiver accepts the request, the sender has the funds for the transaction") {
             val user1 = PersistableUser.inMemory(0.0)
             val user2 = PersistableUser.inMemory(20.0)
             val initialBalance = user1.balance
@@ -31,7 +31,7 @@ class ReceiveMoneySpecification : FeatureSpec({
             usersRepository[user1.id].balance shouldBeExactly initialBalance + request.amount
         }
 
-        scenario("The receiver has a request out to the lender") {
+        test("The receiver has a request out to the lender") {
             val user1 = PersistableUser.inMemory(0.0)
             val user2 = PersistableUser.inMemory(20.0)
 
@@ -41,16 +41,19 @@ class ReceiveMoneySpecification : FeatureSpec({
 
                 user1.pendingRequests(forUser = user2).count() shouldNotBeLessThan 1
                 user2.accept(user1.ask(user2, forAmount = 10.0))
+
+                usersRepository[user2.id].balance shouldBeExactly user2.balance - 10.0
+                usersRepository[user1.id].balance shouldBeExactly user1.balance + 10.0
             }
         }
     }
 
-    feature("User.reject()") {
+    context("User.reject()") {
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
 
-        scenario("The receiver rejects, no transaction occurs") {
+        test("The receiver rejects, no transaction occurs") {
             val user1 = PersistableUser.inMemory(100.0)
             val user2 = PersistableUser.inMemory(100.0)
 
@@ -70,7 +73,7 @@ class ReceiveMoneySpecification : FeatureSpec({
 
         }
 
-        scenario("The receiver has a request out to the lender") {
+        test("The receiver has a request out to the lender") {
 
             val user1 = PersistableUser.inMemory(100.0)
             val user2 = PersistableUser.inMemory(100.0)

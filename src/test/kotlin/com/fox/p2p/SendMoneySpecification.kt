@@ -3,19 +3,19 @@ package com.fox.p2p
 import com.fox.persistence.UsersRepository
 import com.fox.user.PersistableUser
 import io.kotlintest.shouldBe
-import io.kotlintest.specs.FeatureSpec
+import io.kotlintest.specs.FunSpec
 
 /**
  * Created by Stephen Fox on 3/24/19.
  */
-class SendMoneySpecification : FeatureSpec({
+class SendMoneySpecification : FunSpec({
 
-    feature("User.accept()") {
+    context("User.accept()") {
 
         val usersRepository = UsersRepository()
         val service = SendMoneyService(usersRepository)
 
-        scenario("Two brand new users, one sends money to the other") {
+        test("Two brand new users, one sends money to the other") {
 
             val user1 = PersistableUser.inMemory(100.0)
             val user2 = PersistableUser.inMemory(100.0)
