@@ -12,12 +12,12 @@ import io.kotlintest.specs.FunSpec
  */
 class ReceiveMoneySpecification : FunSpec({
 
-    context("User.accept()") {
+    context("Receiver accepts") {
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
 
-        test("The receiver accepts the request, the sender has the funds for the transaction") {
+        test("the sender has the funds for the transaction") {
             val user1 = PersistableUser.inMemory(0.0)
             val user2 = PersistableUser.inMemory(20.0)
             val initialBalance = user1.balance
@@ -31,7 +31,7 @@ class ReceiveMoneySpecification : FunSpec({
             usersRepository[user1.id].balance shouldBeExactly initialBalance + request.amount
         }
 
-        test("The receiver has a request out to the lender") {
+        test("While there is a pending request out to the lender") {
             val user1 = PersistableUser.inMemory(0.0)
             val user2 = PersistableUser.inMemory(20.0)
 
@@ -48,12 +48,12 @@ class ReceiveMoneySpecification : FunSpec({
         }
     }
 
-    context("User.reject()") {
+    context("Receiver rejects") {
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
 
-        test("The receiver rejects, no transaction occurs") {
+        test("Brand new users: no transaction occurs") {
             val user1 = PersistableUser.inMemory(100.0)
             val user2 = PersistableUser.inMemory(100.0)
 
@@ -73,7 +73,7 @@ class ReceiveMoneySpecification : FunSpec({
 
         }
 
-        test("The receiver has a request out to the lender") {
+        test("Pending request out to the lender, no transaction occurs") {
 
             val user1 = PersistableUser.inMemory(100.0)
             val user2 = PersistableUser.inMemory(100.0)

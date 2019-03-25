@@ -50,16 +50,16 @@ class MoneyEntreatyService(
     }
 
     /**
-     * filter the transactions for the request that [requester] made to [entreated]
+     * filter the transactions for the request that [from] made to [to]
      * and begin the computation.
      */
     private fun createRequest(
-        requester: PersistableUser,
-        entreated: PersistableUser,
+        from: PersistableUser,
+        to: PersistableUser,
         amount: Money
     ): MoneyEntreatyRequest {
         // Maybe a persisted extension class that just delegates...
-        val request = MoneyEntreatyRequest(amount, receiver = requester, entreatant = entreated)
+        val request = MoneyEntreatyRequest(amount, receiver = from, entreatant = to)
 
         requestsRepository.track(request)
 
@@ -67,11 +67,11 @@ class MoneyEntreatyService(
     }
 
     /**
-     * Removes the [request] for the supplied [persistableUser]
+     * Removes the [request] for the supplied [forUser]
      */
-    private fun deleteRequest(persistableUser: PersistableUser, request: MoneyEntreatyRequest) {
+    private fun deleteRequest(forUser: PersistableUser, request: MoneyEntreatyRequest) {
         // no transaction, just don't allow the request to be processed
-        requestsRepository.complete(request, persistableUser.id)
+        requestsRepository.complete(request, forUser.id)
     }
 
 
@@ -120,11 +120,11 @@ class MoneyEntreatyService(
      * </code>
      */
     fun PersistableUser.ask(user: PersistableUser, forAmount: Money): MoneyEntreatyRequest {
-        return this@MoneyEntreatyService.createRequest(this, user, forAmount)
+        return this@MoneyEntreatyService.createRequest(from = this, to = user, amount = forAmount)
     }
 
-    fun PersistableUser.reject(reject: MoneyEntreatyRequest) {
-        this@MoneyEntreatyService.deleteRequest(this, reject)
+    fun PersistableUser.reject(request: MoneyEntreatyRequest) {
+        this@MoneyEntreatyService.deleteRequest(forUser = this, request = request)
     }
 
 }
