@@ -22,10 +22,8 @@ interface IUser {
 /**
  * An lazy, delegating type that loads data when necessary, rather than
  * being a dumb data carrier that needs orchestration.
- *
- * TODO: Rename. This class is persist-able (because it comes with an id)
  */
-class PersistedUser
+class PersistableUser
 private constructor(
     override val balance: Money,
     val id: UserId = UserId.randomUUID()
@@ -33,10 +31,10 @@ private constructor(
 
     companion object {
 
-        fun inMemory(balance: Money): PersistedUser = when {
-            balance.isNan() -> PersistedUser(0.0)
-            balance < 0 -> PersistedUser(0.0)
-            else -> PersistedUser(balance)
+        fun inMemory(balance: Money): PersistableUser = when {
+            balance.isNan() -> PersistableUser(0.0)
+            balance < 0 -> PersistableUser(0.0)
+            else -> PersistableUser(balance)
         }
 
         private fun Money.isNan() = this == (Money.NaN as Number)
@@ -47,4 +45,4 @@ private constructor(
     }
 }
 
-data class User(override val balance: Money): IUser
+data class User(override val balance: Money) : IUser

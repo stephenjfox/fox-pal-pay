@@ -1,6 +1,7 @@
-import com.fox.p2p.MoneyEntreatyService
+package com.fox.p2p
+
 import com.fox.persistence.UsersRepository
-import com.fox.user.PersistedUser
+import com.fox.user.PersistableUser
 import io.kotlintest.matchers.doubles.shouldBeExactly
 import io.kotlintest.matchers.numerics.shouldNotBeLessThan
 import io.kotlintest.shouldBe
@@ -15,9 +16,10 @@ class ReceiveMoneySpecification : FeatureSpec({
 
         val usersRepository = UsersRepository()
         val service = MoneyEntreatyService(usersRepository)
+
         scenario("The receiver accepts the request, the sender has the funds for the transaction") {
-            val user1 = PersistedUser.inMemory(0.0)
-            val user2 = PersistedUser.inMemory(20.0)
+            val user1 = PersistableUser.inMemory(0.0)
+            val user2 = PersistableUser.inMemory(20.0)
             val initialBalance = user1.balance
 
             val request = with(service) {
@@ -30,8 +32,8 @@ class ReceiveMoneySpecification : FeatureSpec({
         }
 
         scenario("The receiver has a request out to the lender") {
-            val user1 = PersistedUser.inMemory(0.0)
-            val user2 = PersistedUser.inMemory(20.0)
+            val user1 = PersistableUser.inMemory(0.0)
+            val user2 = PersistableUser.inMemory(20.0)
 
             with(service) {
                 // set our state/precondition
@@ -49,8 +51,8 @@ class ReceiveMoneySpecification : FeatureSpec({
         val service = MoneyEntreatyService(usersRepository)
 
         scenario("The receiver rejects, no transaction occurs") {
-            val user1 = PersistedUser.inMemory(100.0)
-            val user2 = PersistedUser.inMemory(100.0)
+            val user1 = PersistableUser.inMemory(100.0)
+            val user2 = PersistableUser.inMemory(100.0)
 
             usersRepository.register(user1, user2)
 
@@ -70,8 +72,8 @@ class ReceiveMoneySpecification : FeatureSpec({
 
         scenario("The receiver has a request out to the lender") {
 
-            val user1 = PersistedUser.inMemory(100.0)
-            val user2 = PersistedUser.inMemory(100.0)
+            val user1 = PersistableUser.inMemory(100.0)
+            val user2 = PersistableUser.inMemory(100.0)
 
             with(service) {
                 // initial state: a pending request
@@ -82,8 +84,6 @@ class ReceiveMoneySpecification : FeatureSpec({
                 user1.pendingRequests(forUser = user2).count() shouldBe 0
             }
         }
-
-
     }
 
 })

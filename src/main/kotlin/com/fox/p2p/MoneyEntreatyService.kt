@@ -1,9 +1,11 @@
 package com.fox.p2p
 
 import com.fox.money.Money
+import com.fox.money.minus
+import com.fox.money.plus
 import com.fox.persistence.RequestsRepository
 import com.fox.persistence.UsersRepository
-import com.fox.user.PersistedUser
+import com.fox.user.PersistableUser
 import com.fox.user.User
 
 /**
@@ -31,27 +33,31 @@ class MoneyEntreatyService(
     private val requestsRepository: RequestsRepository = RequestsRepository()
 ) {
     /**
-     * Accept the request for money on behalf of the [persistedUser], deducting the [MoneyEntreatyRequest.amount]
+     * Accept the request for money on behalf of the [persistableUser], deducting the [MoneyEntreatyRequest.amount]
      * from that user and giving it to the [MoneyEntreatyRequest.receiver]
      */
-    private fun acceptFor(persistedUser: PersistedUser, request: MoneyEntreatyRequest) {
+    private fun acceptFor(persistableUser: PersistableUser, request: MoneyEntreatyRequest) {
 
-        val entreatantUpdate: User = persistedUser - request.amount
+        val entreatantUpdate: User = persistableUser - request.amount
         val requesterUpdate: User = request.receiver + request.amount
 
         // persist the changes
-        usersRepository[persistedUser.id] = entreatantUpdate
+        usersRepository[persistableUser.id] = entreatantUpdate
         usersRepository[request.receiver.id] = requesterUpdate
 
         // close the transaction
-        requestsRepository.complete(request, persistedUser.id)
+        requestsRepository.complete(request, persistableUser.id)
     }
 
     /**
      * filter the transactions for the request that [requester] made to [entreated]
      * and begin the computation.
      */
-    private fun createRequest(requester: PersistedUser, entreated: PersistedUser, amount: Money): MoneyEntreatyRequest {
+    private fun createRequest(
+        requester: PersistableUser,
+        entreated: PersistableUser,
+        amount: Money
+    ): MoneyEntreatyRequest {
         // Maybe a persisted extension class that just delegates...
         val request = MoneyEntreatyRequest(amount, receiver = requester, entreatant = entreated)
 
@@ -61,11 +67,11 @@ class MoneyEntreatyService(
     }
 
     /**
-     * Removes the [request] for the supplied [persistedUser]
+     * Removes the [request] for the supplied [persistableUser]
      */
-    private fun deleteRequest(persistedUser: PersistedUser, request: MoneyEntreatyRequest) {
+    private fun deleteRequest(persistableUser: PersistableUser, request: MoneyEntreatyRequest) {
         // no transaction, just don't allow the request to be processed
-        requestsRepository.complete(request, persistedUser.id)
+        requestsRepository.complete(request, persistableUser.id)
     }
 
 
@@ -87,7 +93,7 @@ class MoneyEntreatyService(
      *     val requestsToBrittany = user.pendingRequests(forUser = brittany).count()
      * </code>
      */
-    fun PersistedUser.pendingRequests(forUser: PersistedUser): Sequence<MoneyEntreatyRequest> {
+    fun PersistableUser.pendingRequests(forUser: PersistableUser): Sequence<MoneyEntreatyRequest> {
         return this@MoneyEntreatyService.requestsRepository.entreatiesFor(forUser).filter { it.receiver == this }
     }
 
@@ -100,7 +106,7 @@ class MoneyEntreatyService(
      *     user.accept(request)
      * </code>
      */
-    fun PersistedUser.accept(request: MoneyEntreatyRequest) {
+    fun PersistableUser.accept(request: MoneyEntreatyRequest) {
         this@MoneyEntreatyService.acceptFor(this, request)
     }
 
@@ -113,20 +119,12 @@ class MoneyEntreatyService(
      *     user1.ask(user2, forAmount = 10.0)
      * </code>
      */
-    fun PersistedUser.ask(user: PersistedUser, forAmount: Money): MoneyEntreatyRequest {
+    fun PersistableUser.ask(user: PersistableUser, forAmount: Money): MoneyEntreatyRequest {
         return this@MoneyEntreatyService.createRequest(this, user, forAmount)
     }
 
-    fun PersistedUser.reject(reject: MoneyEntreatyRequest) {
+    fun PersistableUser.reject(reject: MoneyEntreatyRequest) {
         this@MoneyEntreatyService.deleteRequest(this, reject)
     }
 
-}
-
-private operator fun PersistedUser.minus(amount: Money): User {
-    return User(this.balance - amount)
-}
-
-private operator fun PersistedUser.plus(amount: Money): User {
-    return User(this.balance + amount)
 }

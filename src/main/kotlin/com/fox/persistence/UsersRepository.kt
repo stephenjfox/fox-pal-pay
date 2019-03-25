@@ -1,6 +1,6 @@
 package com.fox.persistence
 
-import com.fox.user.PersistedUser
+import com.fox.user.PersistableUser
 import com.fox.user.User
 import com.fox.user.UserId
 
@@ -24,11 +24,11 @@ class UsersRepository {
         return backingStore[id] ?: error("Attempted to 'get' a non-register user")
     }
 
-    fun register(vararg persistedUsers: PersistedUser) {
-        for (persistedUser in persistedUsers) {
+    fun register(vararg persistableUsers: PersistableUser) {
+        for (persistedUser in persistableUsers) {
             backingStore[persistedUser.id] = persistedUser.toUser()
         }
     }
 }
 
-private fun PersistedUser.toUser() = User(this.balance)
+private fun PersistableUser.toUser() = User(this.balance)
