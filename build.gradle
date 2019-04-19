@@ -13,6 +13,7 @@ repositories {
 }
 
 def arrow_version = "0.9.0"
+def http4kVersion = "3.132.0"
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -21,9 +22,9 @@ dependencies {
     implementation "io.arrow-kt:arrow-core-data:$arrow_version"
     implementation "io.arrow-kt:arrow-core-extensions:$arrow_version"
 
-    implementation group: "org.http4k", name: "http4k-core", version: "3.32.1"
-    implementation group: "org.http4k", name: "http4k-server-jetty", version: "3.32.1"
-    implementation group: "org.http4k", name: "http4k-client-okhttp", version: "3.32.1"
+    implementation group: "org.http4k", name: "http4k-core", version: http4kVersion
+    implementation group: "org.http4k", name: "http4k-server-jetty", version: http4kVersion
+    implementation group: "org.http4k", name: "http4k-client-okhttp", version: http4kVersion
 
 
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.3.0'
