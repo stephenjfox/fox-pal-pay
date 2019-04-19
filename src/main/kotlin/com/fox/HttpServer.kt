@@ -1,19 +1,25 @@
 package com.fox
 
-import com.fox.web.Http4kAppServer
+import org.http4k.core.*
+import org.http4k.routing.RoutingHttpHandler
+import org.http4k.routing.bind
+import org.http4k.routing.routes
 import org.http4k.server.Jetty
-import org.http4k.server.asServer
+import org.http4k.server.ServerConfig
 
 fun main() {
 
-    AppServer.start(8080)
-
+    val moneyApp = MoneyApp()
+    moneyApp.start(Jetty(8080))
 }
 
-object AppServer {
-    fun start(port: Int) {
-        // no need to detach from the thread at this point.
-        // if we ever wanted asynchronous work just swap "block()" for "start()"
-        Http4kAppServer().asServer(Jetty(port)).block()
-    }
+fun MoneyApp(): RoutingHttpHandler {
+    val moneyApp = routes(
+        "ping" bind Method.GET to { request: Request -> Response(Status.OK).body("Success") }
+    )
+    return moneyApp
 }
+
+// no need to detach from the thread at this point.
+// if we ever wanted asynchronous work just swap "block()" for "start()"
+fun HttpHandler.start(config: ServerConfig) = config.toServer(this).block()
